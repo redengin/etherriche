@@ -1,9 +1,9 @@
 # Ether Riche
 
-Buy your way into history, by being recorded as one of the Ether Riche!
+Buy your way into history- by having your position recorded on the blockchain forever as one of the Ether Riche!
 
 The top 5 contributors will be listed on the public website, allowing you to show off as one of the Ether Riche.
-Contributors paying more, will unseat your position.  As well, over time, your position will dwindle and require
+Contributors paying more, will unseat your position.  As well, your position will dwindle over time, requiring
 additional contribution to maintain your listing.
 
-I hope you all enjoy making history!
+Enjoy making history!
