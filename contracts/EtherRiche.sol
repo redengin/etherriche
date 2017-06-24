@@ -114,6 +114,8 @@ contract EtherRiche
         _seats[lowestClaimIndex].riche.addr = msg.sender;
         _seats[lowestClaimIndex].riche.avatarUrl = _avatarUrl;
         _seats[lowestClaimIndex].riche.message = _message;
+
+        _updateBurnRate();
       }
       else
       {
@@ -121,6 +123,12 @@ contract EtherRiche
         throw;
       }
     }
+  }
+
+
+  function _updateBurnRate() private
+  {
+    burnRate = ( msg.value / ( 30 days ) );
   }
 
 
