@@ -5,8 +5,10 @@ pragma solidity ^0.4.10;
 
 contract EtherRiche
 {
-  /* The continuous burn rate for claim_wei */
+  /* The continuous burn rate for claim_wei per second */
   uint      public    burnRate;
+  /* The last time the burnRate was recalculated */
+  uint      public    lastUpdate;
 
   /* A public list of the seats */
   address   public    seat0_address;
@@ -73,9 +75,7 @@ contract EtherRiche
   function _presentValue( uint _value )
       private constant returns (uint)
   {
-    // return ( _value - ( _rate * _time ) );
-    // FIXME
-    return ( _value - 100 );
+    return ( _value - ( burnRate * ( now - lastUpdate ) ) );
   }
 
 
@@ -114,8 +114,6 @@ contract EtherRiche
         _seats[lowestClaimIndex].riche.addr = msg.sender;
         _seats[lowestClaimIndex].riche.avatarUrl = _avatarUrl;
         _seats[lowestClaimIndex].riche.message = _message;
-
-        _updateBurnRate();
       }
       else
       {
@@ -126,38 +124,64 @@ contract EtherRiche
   }
 
 
-  function _updateBurnRate() private
-  {
-    burnRate = ( msg.value / ( 30 days ) );
-  }
-
-
   function _updatePublicData() private
   {
+    uint maxClaimIndex = 0;
+
     seat0_address    = _seats[0].riche.addr;
     seat0_avatarUrl  = _seats[0].riche.avatarUrl;
     seat0_message    = _seats[0].riche.message;
     seat0_claim_wei  = _seats[0].claim_wei;
+    if( _seats[maxClaimIndex].claim_wei < _seats[0].claim_wei )
+    {
+      maxClaimIndex = 0;
+    }
 
     seat1_address    = _seats[1].riche.addr;
     seat1_avatarUrl  = _seats[1].riche.avatarUrl;
     seat1_message    = _seats[1].riche.message;
     seat1_claim_wei  = _seats[1].claim_wei;
+    if( _seats[maxClaimIndex].claim_wei < _seats[1].claim_wei )
+    {
+      maxClaimIndex = 1;
+    }
 
     seat2_address    = _seats[2].riche.addr;
     seat2_avatarUrl  = _seats[2].riche.avatarUrl;
     seat2_message    = _seats[2].riche.message;
     seat2_claim_wei  = _seats[2].claim_wei;
+    if( _seats[maxClaimIndex].claim_wei < _seats[2].claim_wei )
+    {
+      maxClaimIndex = 2;
+    }
 
     seat3_address    = _seats[3].riche.addr;
     seat3_avatarUrl  = _seats[3].riche.avatarUrl;
     seat3_message    = _seats[3].riche.message;
     seat3_claim_wei  = _seats[3].claim_wei;
+    if( _seats[maxClaimIndex].claim_wei < _seats[3].claim_wei )
+    {
+      maxClaimIndex = 3;
+    }
 
     seat4_address    = _seats[4].riche.addr;
     seat4_avatarUrl  = _seats[4].riche.avatarUrl;
     seat4_message    = _seats[4].riche.message;
     seat4_claim_wei  = _seats[4].claim_wei;
+    if( _seats[maxClaimIndex].claim_wei < _seats[4].claim_wei )
+    {
+      maxClaimIndex = 4;
+    }
+
+    _updateBurnRate( maxClaimIndex );
+  }
+
+
+  function _updateBurnRate( uint _maxClaimIndex ) private
+  {
+    /* burn the max claim over the next 30 days */
+    burnRate = ( _seats[_maxClaimIndex].claim_wei / ( 30 days ) );
+    lastUpdate = now;
   }
 
 }
