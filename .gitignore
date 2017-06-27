@@ -1,2 +1,2 @@
-contracts/bin
+bin/*
 contracts/test/node*
