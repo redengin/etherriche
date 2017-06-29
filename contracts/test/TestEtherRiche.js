@@ -7,16 +7,18 @@ describe( 'etherRiche', function ()
 {
   var bankAddress = '0x8bb00852623184d534d9805c66ed85b1d8ec0f52';
 
+  /* use a mock blockchain */
   var web3 = new Web3();
   web3.setProvider( TestRpc.provider() );
 
+  /* create the contract Class */
   var fs = require( 'fs' );
   var abi = JSON.parse( fs.readFileSync( './bin/contracts/EtherRiche.abi' ) );
   var bytecode = fs.readFileSync( './bin/contracts/EtherRiche.bin', 'utf8' );
   var Contract = web3.eth.contract( abi );
 
   var accounts;
-  it( 'requires an account to create a contract', function ( done )
+  it( 'requires mock accounts', function ( done )
   {
     /* get the first testrpc account */
     web3.eth.getAccounts(
@@ -36,7 +38,7 @@ describe( 'etherRiche', function ()
   } );
 
   var contractAddress;
-  it( 'should require a contract', function ( done )
+  it( 'requires a contract', function ( done )
   {
     /* create the contract using the first account */
     var contract = Contract.new(
@@ -45,9 +47,9 @@ describe( 'etherRiche', function ()
         data: bytecode,
         gas: 4E6
       },
-      function ( err, _contract )
+      function ( _err, _contract )
       {
-        if ( !err )
+        if ( ! _err )
         {
           if ( _contract.address )
           {
@@ -57,21 +59,21 @@ describe( 'etherRiche', function ()
         }
         else
         {
-          done( err );
+          done( _err );
         }
       }
     );
   } );
 
+  var claim = 200;
   it( 'should accept the first claim', function ( done )
   {
     var contract = Contract.at( contractAddress );
 
-    var claim = 200;
     contract.buySeat( 'a url to an avatar', 'hello world',
       {
         from: accounts[0],
-        value: 200,
+        value: claim,
         gas: 4E6,
       },
       function ( _err, _result )
@@ -99,7 +101,7 @@ describe( 'etherRiche', function ()
         }
         else if ( _result )
         {
-          assert( 200 == _result );
+          assert( claim == _result );
           done();
         }
       }
@@ -107,9 +109,42 @@ describe( 'etherRiche', function ()
   } );
 
 
-  it( 'should require payment', function ()
+  describe( 'should require payment', function ()
   {
-    // TODO
+    var badAvatarUrl = 'BAD';
+    it( 'gets a payment of 0', function ( done )
+    {
+      var contract = Contract.at( contractAddress );
+      contract.buySeat( badAvatarUrl, 'BAD',
+        {
+          from: accounts[0],
+          value: 0,
+          gas: 4E6,
+        },
+        function ( _err, _result )
+        {
+          if ( _err )
+          {
+            done( _err );
+          }
+          else
+          {
+            done();
+          }
+        }
+      );
+    } );
+
+    it( 'rejects a claim of 0', function ( )
+    {
+      var contract = Contract.at( contractAddress );
+      assert.notEqual( badAvatarUrl, contract.seat0_avatarUrl );
+      assert.notEqual( badAvatarUrl, contract.seat1_avatarUrl );
+      assert.notEqual( badAvatarUrl, contract.seat2_avatarUrl );
+      assert.notEqual( badAvatarUrl, contract.seat3_avatarUrl );
+      assert.notEqual( badAvatarUrl, contract.seat4_avatarUrl );
+    } );
+
   } );
 
   it( 'should reject a payment less than or eual to the minimum', function ()
