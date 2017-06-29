@@ -118,6 +118,7 @@ contract EtherRiche
       else
       {
         /* no seat available */
+        // TODO event
         throw;
       }
     }
