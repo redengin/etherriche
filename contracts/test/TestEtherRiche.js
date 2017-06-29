@@ -108,17 +108,17 @@ describe( 'etherRiche', function ()
     );
   } );
 
-  it( 'should reject a payment less than the minimum present value minimum', function ()
+  it( 'should reject a payment less than the present value minimum', function ()
   {
     // TODO
   } );
 
-  it( 'should accept a payment greater than the minimum present claim values', function ()
+  it( 'should accept a payment greater than the minimum present minimum', function ()
   {
     // TODO
   } );
 
-  it( 'should degrade all claims in 30 days', function ()
+  it( 'should zero all claims in 30 days', function ()
   {
     // TODO
   } );
