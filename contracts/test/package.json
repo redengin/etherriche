@@ -6,7 +6,8 @@
     "test"  : "mocha TestEtherRiche.js"
   },
   "devDependencies": {
-    "mocha"       : ">=3.4.2",
-    "web3"        : ">=0.19.1"
+    "mocha"                 : ">=3.4.2",
+    "web3"                  : ">=0.19.1",
+    "ethereumjs-testrpc"    : ">=0.19.1"
   }
 }

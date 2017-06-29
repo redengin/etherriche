@@ -1,15 +1,11 @@
 #!/bin/bash
 
 TESTDIR=$(dirname $(readlink -f "$0"))
-echo ${TESTDIR}
+BINDIR=$(realpath ${TESTDIR}/../../bin)
+IMAGE=harshjv/testrpc
 
-# start TestRpc
-docker pull harshjv/testrpc
-docker run --name TestRpc -d -p 8545:8545 \
-    -v ${TESTDIR}:${TESTDIR} \
-    harshjv/testrpc
-
-# run the tests
-docker exec TestRpc sh -c "cd ${TESTDIR} && npm install && npm test"
-
-docker rm -f TestRpc
+# run the tests via NPM
+docker run --rm --entrypoint="/bin/sh"    \
+     -v ${TESTDIR}:${TESTDIR}             \
+     -v ${BINDIR}:${TESTDIR}/bin          \
+     -t ${IMAGE} -c "cd ${TESTDIR} && npm install && npm test"
