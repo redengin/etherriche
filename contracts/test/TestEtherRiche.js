@@ -10,19 +10,19 @@ describe( 'etherRiche', function ()
   var web3 = new Web3();
   web3.setProvider( TestRpc.provider() );
 
-  var fs = require('fs');
+  var fs = require( 'fs' );
   var abi = JSON.parse( fs.readFileSync( './bin/contracts/EtherRiche.abi' ) );
   var bytecode = fs.readFileSync( './bin/contracts/EtherRiche.bin', 'utf8' );
   var Contract = web3.eth.contract( abi );
 
   var accounts;
-  it( 'requires an account to create a contract', function( done )
+  it( 'requires an account to create a contract', function ( done )
   {
     /* get the first testrpc account */
     web3.eth.getAccounts(
-      function( _err, _accounts )
+      function ( _err, _accounts )
       {
-        if( !_err )
+        if ( !_err )
         {
           accounts = _accounts;
           done();
@@ -38,20 +38,18 @@ describe( 'etherRiche', function ()
   var contractAddress;
   it( 'should require a contract', function ( done )
   {
-    var gasEstimate = 4E6;
-
     /* create the contract using the first account */
     var contract = Contract.new(
       {
         from: accounts[0],
         data: bytecode,
-        gas:  gasEstimate
+        gas: 4E6
       },
-      function( err, _contract )
+      function ( err, _contract )
       {
-        if( !err )
+        if ( !err )
         {
-          if( _contract.address )
+          if ( _contract.address )
           {
             contractAddress = _contract.address;
             done();
@@ -60,6 +58,49 @@ describe( 'etherRiche', function ()
         else
         {
           done( err );
+        }
+      }
+    );
+  } );
+
+  it( 'should accept the first claim', function ( done )
+  {
+    var contract = Contract.at( contractAddress );
+
+    var claim = 200;
+    contract.buySeat( 'a url to an avatar', 'hello world',
+      {
+        from: accounts[0],
+        value: 200,
+        gas: 4E6,
+      },
+      function ( _err, _result )
+      {
+        if ( _err )
+        {
+          done( _err );
+        }
+        else if ( _result )
+        {
+          done();
+        }
+      }
+    );
+  } );
+
+  it( 'should transfer funds to the bank', function ( done )
+  {
+    web3.eth.getBalance( bankAddress,
+      function ( _err, _result )
+      {
+        if ( _err )
+        {
+          done( _err );
+        }
+        else if ( _result )
+        {
+          assert( 200 == _result );
+          done();
         }
       }
     );
