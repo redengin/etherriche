@@ -118,7 +118,7 @@ describe( 'etherRiche', function ()
     // TODO
   } );
 
-  it( 'should require the maximal claim degrade in 30 days', function ()
+  it( 'should require the degrade all claims in 30 days', function ()
   {
     // TODO
   } );
