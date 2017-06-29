@@ -108,46 +108,7 @@ describe( 'etherRiche', function ()
     );
   } );
 
-
-  describe( 'should require payment', function ()
-  {
-    var badAvatarUrl = 'BAD';
-    it( 'gets a payment of 0', function ( done )
-    {
-      var contract = Contract.at( contractAddress );
-      contract.buySeat( badAvatarUrl, 'BAD',
-        {
-          from: accounts[0],
-          value: 0,
-          gas: 4E6,
-        },
-        function ( _err, _result )
-        {
-          if ( _err )
-          {
-            done( _err );
-          }
-          else
-          {
-            done();
-          }
-        }
-      );
-    } );
-
-    it( 'rejects a claim of 0', function ( )
-    {
-      var contract = Contract.at( contractAddress );
-      assert.notEqual( badAvatarUrl, contract.seat0_avatarUrl );
-      assert.notEqual( badAvatarUrl, contract.seat1_avatarUrl );
-      assert.notEqual( badAvatarUrl, contract.seat2_avatarUrl );
-      assert.notEqual( badAvatarUrl, contract.seat3_avatarUrl );
-      assert.notEqual( badAvatarUrl, contract.seat4_avatarUrl );
-    } );
-
-  } );
-
-  it( 'should reject a payment less than or eual to the minimum', function ()
+  it( 'should reject a payment less than the minimum present value minimum', function ()
   {
     // TODO
   } );
@@ -162,12 +123,7 @@ describe( 'etherRiche', function ()
     // TODO
   } );
 
-  it( 'should topoff a current seat value', function ()
-  {
-    // TODO
-  } );
-
-  it( 'should replace the lowest seat given a more valuable claim', function ()
+  it( 'should topoff a current claim', function ()
   {
     // TODO
   } );
