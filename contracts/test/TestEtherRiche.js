@@ -3,7 +3,8 @@ var TestRpc = require( 'ethereumjs-testrpc' );
 var Web3 = require( 'web3' );
 
 
-
+// TODO refactor repeated calls into global methods
+// TODO decouple expectations from previous operations
 describe( 'etherRiche', function ()
 {
   var bankAddress = '0x8bb00852623184d534d9805c66ed85b1d8ec0f52';
@@ -308,7 +309,6 @@ describe( 'etherRiche', function ()
         done();
       }
     }
-
 
     var completed = false;
     for( var seat=0; 5 > seat; ++seat )
