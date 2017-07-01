@@ -311,10 +311,10 @@ describe( 'etherRiche', function ()
 
 
     var completed = false;
-    for( var i=0; 5 > i; ++i )
+    for( var seat=0; 5 > seat; ++seat )
     {
-      var _index = i;
-      Contract.at( contractAddress ).getSeatClaim( i,
+      var _index = seat;
+      Contract.at( contractAddress ).getSeatClaim( seat,
         ( _err, _claim ) =>
         {
           if( _err )
