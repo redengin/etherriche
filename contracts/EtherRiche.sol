@@ -78,7 +78,6 @@ contract EtherRiche
   {
     var lowestClaimIndex = 0;
     var isTopUp = false;
-
     for( var i=0; _seats.length > i; ++i )
     {
       _seats[i].claim_wei = _presentValue( _seats[i].claim_wei );
@@ -91,7 +90,7 @@ contract EtherRiche
       }
       else
       {
-        if( _seats[lowestClaimIndex].claim_wei < _seats[i].claim_wei )
+        if( _seats[i].claim_wei < _seats[lowestClaimIndex].claim_wei )
         {
           /* found a new lowest claim */
           lowestClaimIndex = i;

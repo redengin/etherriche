@@ -70,7 +70,7 @@ describe( 'etherRiche', function ()
   } );
 
 
-  var claim = 200;
+  var claim = 1;
   it( 'should accept the first five claims', function ( done )
   {
     this.timeout( 3000 );
@@ -192,31 +192,8 @@ describe( 'etherRiche', function ()
   } );
 
 
-  it( 'should zero all claims in 30 days', function( done )
+  it( 'the test 30 days to pass', function( done )
   {
-    /* after advancing time, lowball a seat */
-    function lowballASeat()
-    {
-      Contract.at( contractAddress ).buySeat( 'replacer lowballer', 'I replaced a seat',
-        {
-          from: accounts[7],
-          value: 1,
-          gas: 4E6,
-        },
-        function ( _err, _result )
-        {
-          if ( _err )
-          {
-            done( _err );
-          }
-          else
-          {
-            done();
-          }
-        }
-      );
-    }
-
     /* after advancing time, mine to record time change */
     function mine()
     {
@@ -233,7 +210,7 @@ describe( 'etherRiche', function ()
           }
           else
           {
-            lowballASeat();
+            done();
           }
         }
       );
@@ -259,9 +236,9 @@ describe( 'etherRiche', function ()
   } );
 
 
-  it( 'should topoff a current claim', function( done )
+  it( 'should accept any claim after 30 days', function( done )
   {
-    Contract.at( contractAddress ).buySeat( 'replacer greater', 'I replaced a seat',
+    Contract.at( contractAddress ).buySeat( 'lowballer', 'I lowballed a seat',
       {
         from: accounts[7],
         value: 1,
@@ -275,7 +252,29 @@ describe( 'etherRiche', function ()
         }
         else
         {
-          assert.equals( _claim, 2 );
+          done();
+        }
+      }
+    );
+  } );
+
+
+  it( 'should accept topoff a current claim', function( done )
+  {
+    Contract.at( contractAddress ).buySeat( 'replacer greater', 'I replaced a seat',
+      {
+        from: accounts[0],
+        value: 1,
+        gas: 4E6,
+      },
+      function ( _err, _claim )
+      {
+        if ( _err )
+        {
+          done( _err );
+        }
+        else
+        {
           done();
         }
       }
