@@ -169,7 +169,7 @@ describe( 'etherRiche', function ()
   } );
 
 
-  it( 'should accept a payment greater than the minimum present value minimum', function ( done )
+  it( 'should accept a payment greater than the present value minimum', function ( done )
   {
     Contract.at( contractAddress ).buySeat( 'replacer greater', 'I replaced a seat',
       {
@@ -263,8 +263,8 @@ describe( 'etherRiche', function ()
   {
     Contract.at( contractAddress ).buySeat( 'replacer greater', 'I replaced a seat',
       {
-        from: accounts[0],
-        value: 1,
+        from: accounts[4],
+        value: 2,
         gas: 4E6,
       },
       function ( _err, _claim )
@@ -279,6 +279,56 @@ describe( 'etherRiche', function ()
         }
       }
     );
+  } );
+
+
+  it( 'should record the claim value', function( done )
+  {
+    var claimCount = 0;
+    function validateClaim( _index, _claim )
+    {
+      var expectedValue;
+      switch( _index )
+      {
+        case 4:
+                  expectedValue = 2;
+                  break;
+
+        default:
+                  expectedValue = 1;
+                  break;
+      }
+
+      assert.equal( _claim, expectedValue,
+          'expected ' + expectedValue + ' for seat ' + _index + ' got ' + _claim  );
+
+      ++claimCount;
+      if( 5 > claimCount )
+      {
+        done();
+      }
+    }
+
+
+    var completed = false;
+    for( var i=0; 5 > i; ++i )
+    {
+      var _index = i;
+      Contract.at( contractAddress ).getSeatClaim( i,
+        ( _err, _claim ) =>
+        {
+          if( _err )
+          {
+            done( _err );
+          }
+          else
+          {
+            validateClaim( _index, _claim );
+            if( completed ) done();
+          }
+        }
+      );
+    }
   } );
 
 } );

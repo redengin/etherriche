@@ -50,8 +50,27 @@ contract EtherRiche
   }
 
 
+  function getSeatClaim( uint _index )
+    constant returns ( uint )
+  {
+    return _seats[_index].claim_wei;
+  }
+
+  function getSeatClaimAvatarUrl( uint _index )
+    constant returns ( string )
+  {
+    return _seats[_index].riche.avatarUrl;
+  }
+
+  function getSeatClaimMessage( uint _index )
+    constant returns ( string )
+  {
+    return _seats[_index].riche.message;
+  }
+
+
   function _presentValue( uint _value )
-      private constant returns (uint)
+      private constant returns ( uint )
   {
     if( now == lastUpdate )
     {
