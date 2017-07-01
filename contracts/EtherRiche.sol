@@ -53,8 +53,7 @@ contract EtherRiche
   }
 
   /* where we stash all the contributions */
-  // TODO translate to checksum 
-  address   constant  _bank = 0x8bb00852623184d534d9805c66ed85b1d8ec0f52; 
+  address   constant  _bank = 0x8bb00852623184d534D9805c66ed85B1D8EC0f52;
 
   /* the internal store of seats */
   Seat[5]     _seats;
@@ -75,7 +74,24 @@ contract EtherRiche
   function _presentValue( uint _value )
       private constant returns (uint)
   {
-    return ( _value - ( burnRate * ( now - lastUpdate ) ) );
+    if( now == lastUpdate )
+    {
+      /* updating within the same block, no burn */
+      return _value;
+    }
+
+    assert( now > lastUpdate );
+    var burned = ( now - lastUpdate );
+
+    /* soldity does not throw on underflow */
+    if( burned > _value )
+    {
+      return 0;
+    }
+    else
+    {
+      return ( _value - burned );
+    }
   }
 
 
@@ -84,7 +100,7 @@ contract EtherRiche
     var lowestClaimIndex = 0;
     var isTopUp = false;
 
-    for( uint i=0; _seats.length > i; ++i )
+    for( var i=0; _seats.length > i; ++i )
     {
       _seats[i].claim_wei = _presentValue( _seats[i].claim_wei );
 
@@ -99,7 +115,7 @@ contract EtherRiche
         if( _seats[lowestClaimIndex].claim_wei < _seats[i].claim_wei )
         {
           /* found a new lowest claim */
-          lowestClaimIndex = uint8(i);
+          lowestClaimIndex = i;
         }
       }
     }
@@ -118,7 +134,6 @@ contract EtherRiche
       else
       {
         /* no seat available */
-        // TODO event
         throw;
       }
     }
@@ -127,7 +142,7 @@ contract EtherRiche
 
   function _updatePublicData() private
   {
-    uint maxClaimIndex = 0;
+    var maxClaimIndex = 0;
 
     seat0_address    = _seats[0].riche.addr;
     seat0_avatarUrl  = _seats[0].riche.avatarUrl;

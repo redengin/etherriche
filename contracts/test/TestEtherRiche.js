@@ -3,6 +3,7 @@ var TestRpc = require( 'ethereumjs-testrpc' );
 var Web3 = require( 'web3' );
 
 
+
 describe( 'etherRiche', function ()
 {
   var bankAddress = '0x8bb00852623184d534d9805c66ed85b1d8ec0f52';
@@ -18,15 +19,17 @@ describe( 'etherRiche', function ()
   var Contract = web3.eth.contract( abi );
 
   var accounts;
-  it( 'requires mock accounts', function ( done )
+  it( 'requires at least six mock accounts', function ( done )
   {
-    /* get the first testrpc account */
+    /* get the testrpc accounts */
     web3.eth.getAccounts(
       function ( _err, _accounts )
       {
         if ( !_err )
         {
           accounts = _accounts;
+          assert( ( accounts.length >= 6 ),
+              "only found " + accounts.length + " accounts" );
           done();
         }
         else
@@ -36,6 +39,7 @@ describe( 'etherRiche', function ()
       }
     );
   } );
+
 
   var contractAddress;
   it( 'requires a contract', function ( done )
@@ -65,63 +69,76 @@ describe( 'etherRiche', function ()
     );
   } );
 
-  var claim = 200;
-  it( 'should accept the first claim', function ( done )
-  {
-    var contract = Contract.at( contractAddress );
 
-    contract.buySeat( 'a url to an avatar', 'hello world',
-      {
-        from: accounts[0],
-        value: claim,
-        gas: 4E6,
-      },
-      function ( _err, _result )
-      {
-        if ( _err )
+  var claim = 200;
+  it( 'should accept the first five claims', function ( done )
+  {
+    var createdCount = 0;
+    for( var i=0; 5 >= i; ++i )
+    {
+      Contract.at( contractAddress ).buySeat( 'avatar'+i, 'hello world '+i,
         {
-          done( _err );
-        }
-        else if ( _result )
+          from: accounts[i],
+          value: claim,
+          gas: 4E6,
+        },
+        function ( _err, _result )
         {
-          done();
+          if ( _err )
+          {
+            done( _err );
+          }
+          else
+          {
+            console.log( "bought seat" );
+            ++createdCount;
+            if( createdCount >= 5 )
+            {
+              done();
+            }
+          }
         }
-      }
-    );
+      );
+    }
   } );
+
 
   it( 'should transfer funds to the bank', function ( done )
   {
     web3.eth.getBalance( bankAddress,
-      function ( _err, _result )
+      function ( _err, _balance )
       {
         if ( _err )
         {
           done( _err );
         }
-        else if ( _result )
+        else if ( _balance )
         {
-          assert( claim == _result );
+          assert.equal( _balance, ( 5 * claim ) );
           done();
         }
       }
     );
   } );
+
 
   it( 'should reject a payment less than the present value minimum', function ()
   {
     // TODO
   } );
 
-  it( 'should accept a payment greater than the minimum present minimum', function ()
+
+  it( 'should accept a payment greater than the minimum present value minimum', function ()
   {
     // TODO
   } );
+
 
   it( 'should zero all claims in 30 days', function ()
   {
     // TODO
   } );
+
 
   it( 'should topoff a current claim', function ()
   {
