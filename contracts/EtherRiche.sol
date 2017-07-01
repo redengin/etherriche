@@ -6,36 +6,10 @@ pragma solidity ^0.4.10;
 contract EtherRiche
 {
   /* The continuous burn rate for claim_wei per second */
-  uint      public    burnRate;
+  uint constant public burnTime = 30 days;
+  uint      public    burnRate = 0;
   /* The last time the burnRate was recalculated */
-  uint      public    lastUpdate;
-
-  /* A public list of the seats */
-  address   public    seat0_address;
-  string    public    seat0_avatarUrl;
-  string    public    seat0_message;
-  uint      public    seat0_claim_wei;
-
-  address   public    seat1_address;
-  string    public    seat1_avatarUrl;
-  string    public    seat1_message;
-  uint      public    seat1_claim_wei;
-
-  address   public    seat2_address;
-  string    public    seat2_avatarUrl;
-  string    public    seat2_message;
-  uint      public    seat2_claim_wei;
-
-  address   public    seat3_address;
-  string    public    seat3_avatarUrl;
-  string    public    seat3_message;
-  uint      public    seat3_claim_wei;
-
-  address   public    seat4_address;
-  string    public    seat4_avatarUrl;
-  string    public    seat4_message;
-  uint      public    seat4_claim_wei;
-
+  uint      public    lastUpdate = now;
 
   /* The information about the user */
   struct Riche
@@ -58,13 +32,18 @@ contract EtherRiche
   /* the internal store of seats */
   Seat[5]     _seats;
 
+
   function buySeat( string _avatarUrl, string _message ) payable
+      returns( uint )
   {
+    /* no money, no play */
+    assert( msg.value > 0 );
+
     /* update the current seat claims */
     _updateClaims( _avatarUrl, _message );
 
-    /* update the public data */
-    _updatePublicData();
+    /* update the burn rate */
+    _updateBurnRate();
 
     /* take the money */
     _bank.transfer( msg.value );
@@ -81,10 +60,10 @@ contract EtherRiche
     }
 
     assert( now > lastUpdate );
-    var burned = ( now - lastUpdate );
+    var burned = ( burnRate * ( now - lastUpdate ) );
 
     /* soldity does not throw on underflow */
-    if( burned > _value )
+    if( burned >= _value )
     {
       return 0;
     }
@@ -123,7 +102,7 @@ contract EtherRiche
     if( false == isTopUp )
     {
       /* see if the sender has a claim */
-      if( _seats[lowestClaimIndex].claim_wei < msg.value )
+      if( msg.value >= _seats[lowestClaimIndex].claim_wei )
       {
         /* put the contributor into the seat */
         _seats[lowestClaimIndex].claim_wei = msg.value;
@@ -134,70 +113,25 @@ contract EtherRiche
       else
       {
         /* no seat available */
-        throw;
+        revert();
       }
     }
   }
 
 
-  function _updatePublicData() private
+  function _updateBurnRate() private
   {
-    var maxClaimIndex = 0;
-
-    seat0_address    = _seats[0].riche.addr;
-    seat0_avatarUrl  = _seats[0].riche.avatarUrl;
-    seat0_message    = _seats[0].riche.message;
-    seat0_claim_wei  = _seats[0].claim_wei;
-    if( _seats[maxClaimIndex].claim_wei < _seats[0].claim_wei )
+    var maxClaim = msg.value;
+    for( var i=1; _seats.length > i; ++i )
     {
-      maxClaimIndex = 0;
+      if( _seats[i].claim_wei > maxClaim )
+      {
+        maxClaim = _seats[i].claim_wei;
+      }
     }
 
-    seat1_address    = _seats[1].riche.addr;
-    seat1_avatarUrl  = _seats[1].riche.avatarUrl;
-    seat1_message    = _seats[1].riche.message;
-    seat1_claim_wei  = _seats[1].claim_wei;
-    if( _seats[maxClaimIndex].claim_wei < _seats[1].claim_wei )
-    {
-      maxClaimIndex = 1;
-    }
-
-    seat2_address    = _seats[2].riche.addr;
-    seat2_avatarUrl  = _seats[2].riche.avatarUrl;
-    seat2_message    = _seats[2].riche.message;
-    seat2_claim_wei  = _seats[2].claim_wei;
-    if( _seats[maxClaimIndex].claim_wei < _seats[2].claim_wei )
-    {
-      maxClaimIndex = 2;
-    }
-
-    seat3_address    = _seats[3].riche.addr;
-    seat3_avatarUrl  = _seats[3].riche.avatarUrl;
-    seat3_message    = _seats[3].riche.message;
-    seat3_claim_wei  = _seats[3].claim_wei;
-    if( _seats[maxClaimIndex].claim_wei < _seats[3].claim_wei )
-    {
-      maxClaimIndex = 3;
-    }
-
-    seat4_address    = _seats[4].riche.addr;
-    seat4_avatarUrl  = _seats[4].riche.avatarUrl;
-    seat4_message    = _seats[4].riche.message;
-    seat4_claim_wei  = _seats[4].claim_wei;
-    if( _seats[maxClaimIndex].claim_wei < _seats[4].claim_wei )
-    {
-      maxClaimIndex = 4;
-    }
-
-    _updateBurnRate( maxClaimIndex );
-  }
-
-
-  function _updateBurnRate( uint _maxClaimIndex ) private
-  {
     /* burn the max claim over the next 30 days */
-    burnRate = ( _seats[_maxClaimIndex].claim_wei / ( 30 days ) );
-    lastUpdate = now;
+    burnRate = ( maxClaim / burnTime );
   }
 
 }

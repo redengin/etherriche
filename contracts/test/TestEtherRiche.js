@@ -19,7 +19,7 @@ describe( 'etherRiche', function ()
   var Contract = web3.eth.contract( abi );
 
   var accounts;
-  it( 'requires at least six mock accounts', function ( done )
+  it( 'requires at least eight mock accounts', function ( done )
   {
     /* get the testrpc accounts */
     web3.eth.getAccounts(
@@ -28,7 +28,7 @@ describe( 'etherRiche', function ()
         if ( !_err )
         {
           accounts = _accounts;
-          assert( ( accounts.length >= 6 ),
+          assert( ( accounts.length >= 8 ),
               "only found " + accounts.length + " accounts" );
           done();
         }
@@ -73,8 +73,9 @@ describe( 'etherRiche', function ()
   var claim = 200;
   it( 'should accept the first five claims', function ( done )
   {
+    this.timeout( 3000 );
     var createdCount = 0;
-    for( var i=0; 5 >= i; ++i )
+    for( var i=0; 5 > i; ++i )
     {
       Contract.at( contractAddress ).buySeat( 'avatar'+i, 'hello world '+i,
         {
@@ -90,7 +91,6 @@ describe( 'etherRiche', function ()
           }
           else
           {
-            console.log( "bought seat" );
             ++createdCount;
             if( createdCount >= 5 )
             {
@@ -122,27 +122,164 @@ describe( 'etherRiche', function ()
   } );
 
 
-  it( 'should reject a payment less than the present value minimum', function ()
+  it( 'should reject a payment less than the present minimum', function ( done )
   {
-    // TODO
+    Contract.at( contractAddress ).buySeat( 'INVALID', 'INVALID',
+      {
+        from: accounts[5],
+        value: ( claim - 1 ),
+        gas: 4E6,
+      },
+      function ( _err, _result )
+      {
+        if ( _err )
+        {
+          /* failure expected */
+          done();
+        }
+        else
+        {
+          done( 'invalid claim' );
+        }
+      }
+    );
   } );
 
 
-  it( 'should accept a payment greater than the minimum present value minimum', function ()
+  it( 'should accept a payment equal to the present minimum', function ( done )
   {
-    // TODO
+    Contract.at( contractAddress ).buySeat( 'replacer equal', 'I replaced a seat',
+      {
+        from: accounts[5],
+        value: claim,
+        gas: 4E6,
+      },
+      function ( _err, _result )
+      {
+        if ( _err )
+        {
+          done( _err );
+        }
+        else
+        {
+          done();
+        }
+      }
+    );
   } );
 
 
-  it( 'should zero all claims in 30 days', function ()
+  it( 'should accept a payment greater than the minimum present value minimum', function ( done )
   {
-    // TODO
+    Contract.at( contractAddress ).buySeat( 'replacer greater', 'I replaced a seat',
+      {
+        from: accounts[6],
+        value: ( claim + 1 ),
+        gas: 4E6,
+      },
+      function ( _err, _result )
+      {
+        if ( _err )
+        {
+          done( _err );
+        }
+        else
+        {
+          done();
+        }
+      }
+    );
   } );
 
 
-  it( 'should topoff a current claim', function ()
+  it( 'should zero all claims in 30 days', function( done )
   {
-    // TODO
+    /* after advancing time, lowball a seat */
+    function lowballASeat()
+    {
+      Contract.at( contractAddress ).buySeat( 'replacer lowballer', 'I replaced a seat',
+        {
+          from: accounts[7],
+          value: 1,
+          gas: 4E6,
+        },
+        function ( _err, _result )
+        {
+          if ( _err )
+          {
+            done( _err );
+          }
+          else
+          {
+            done();
+          }
+        }
+      );
+    }
+
+    /* after advancing time, mine to record time change */
+    function mine()
+    {
+      web3.currentProvider.sendAsync(
+        {
+          jsonrpc: "2.0",
+          method: "evm_mine"
+        },
+        ( _err ) =>
+        {
+          if( _err )
+          {
+            done( _err );
+          }
+          else
+          {
+            lowballASeat();
+          }
+        }
+      );
+    }
+
+    /* advance the time */
+    var forward_s = ( 30 * 24 * 60 * 60 );  /* thirty days */
+    web3.currentProvider.sendAsync(
+      {
+        jsonrpc: "2.0",
+        method: "evm_increaseTime",
+        params: [ forward_s ]
+      },
+      ( _err ) =>
+      {
+        if( _err )
+        {
+          done( _err );
+        }
+        else mine();
+      }
+    );
+  } );
+
+
+  it( 'should topoff a current claim', function( done )
+  {
+    Contract.at( contractAddress ).buySeat( 'replacer greater', 'I replaced a seat',
+      {
+        from: accounts[7],
+        value: 1,
+        gas: 4E6,
+      },
+      function ( _err, _claim )
+      {
+        if ( _err )
+        {
+          done( _err );
+        }
+        else
+        {
+          assert.equals( _claim, 2 );
+          done();
+        }
+      }
+    );
   } );
 
 } );
