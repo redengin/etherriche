@@ -9,7 +9,7 @@ contract EtherRiche
   uint constant public burnTime = 30 days;
   uint      public    burnRate = 0;
   /* The last time the burnRate was recalculated */
-  uint      public    lastUpdate = now;
+  uint      public    lastBurn;
 
   /* The information about the user */
   struct Riche
@@ -72,14 +72,14 @@ contract EtherRiche
   function _presentValue( uint _value )
       private constant returns ( uint )
   {
-    if( now == lastUpdate )
+    if( now == lastBurn )
     {
       /* updating within the same block, no burn */
       return _value;
     }
 
-    assert( now > lastUpdate );
-    var burned = ( burnRate * ( now - lastUpdate ) );
+    assert( now > lastBurn );
+    var burned = ( burnRate * ( now - lastBurn ) );
 
     /* soldity does not throw on underflow */
     if( burned >= _value )
@@ -150,6 +150,7 @@ contract EtherRiche
 
     /* burn the max claim over the next 30 days */
     burnRate = ( maxClaim / burnTime );
+    lastBurn = now;
   }
 
 }
