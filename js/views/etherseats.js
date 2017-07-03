@@ -1,15 +1,15 @@
 var EtherSeats = Backbone.View.extend(
 {
-  tagName: "ol",
+  tagName: "div",
 
   render: function()
   {
     var template = _.template(
-        '<li>' +
+        '<div>' +
         '<img src=<%= avatarUrl %> />' +
         '<%= message %>' +
         'VALUE: <%= claimValue %>' +
-        '</li>'
+        '</div>'
     );
 
     _.each( this.model.attributes.seats, ( seat ) =>
