@@ -1,15 +1,63 @@
-var EtherRiche = Backbone.Model.extend(
+models.EtherRiche = Backbone.Model.extend(
 {
+  seatCount: 5,
+
   defaults:
   {
+    burnTime:     undefined,  /* seconds until claim is fully burned */
     burnRate:     undefined,  /* wei burned per second */
-    lastUpdate:   undefined,  /* timestamp (in seconds) of last burn */
-    seats:        undefined   /* collection of the current seats */
+    lastBurn:     undefined,  /* timestamp (in seconds) of last burn */
   },
 
-  fetch: ( options ) =>
+  constructor: function()
   {
-    // TODO get the latest state via web3
+    Backbone.Model.apply( this, arguments );
+    this._seats = new collections.Seats();
+  },
+
+  fetch: function( options )
+  {
+    /* fetch burnTime */
+    this.attributes.contract.burnTime.call(
+      ( _err, _result ) =>
+      {
+        if( ! _err ) this.set( 'burnTime', _result.c[0] );
+      }
+    );
+
+    /* fetch burnRate */
+    this.attributes.contract.burnRate.call(
+      ( _err, _result ) =>
+      {
+        if( ! _err ) this.set( 'burnRate', _result.c[0] );
+      }
+    );
+
+    /* fetch lastUpdate */
+    this.attributes.contract.lastBurn.call(
+      ( _err, _result ) =>
+      {
+        if( ! _err ) this.set( 'lastBurn', _result.c[0] );
+      }
+    );
+
+    /* fetch the current Riche */
+    for( var i=0; ( this.seatCount > i ); ++i )
+    {
+      let _i = i;
+      /* fetch current claim */
+      this.attributes.contract.getSeatClaim.call( i,
+        ( _err, _result ) =>
+        {
+          if( ! _err )
+          {
+            var riche = new models.Riche( { id:_i, contract:this.attributes.contract, claimValue:_result.c[0] } );
+            this._seats.set( riche );
+            riche.fetch();
+          }
+        }
+      );
+    }
   },
 
 });

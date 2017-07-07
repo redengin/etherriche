@@ -49,20 +49,19 @@ contract EtherRiche
     _bank.transfer( msg.value );
   }
 
-
   function getSeatClaim( uint _index )
     constant returns ( uint )
   {
     return _seats[_index].claim_wei;
   }
 
-  function getSeatClaimAvatarUrl( uint _index )
+  function getSeatAvatarUrl( uint _index )
     constant returns ( string )
   {
     return _seats[_index].riche.avatarUrl;
   }
 
-  function getSeatClaimMessage( uint _index )
+  function getSeatMessage( uint _index )
     constant returns ( string )
   {
     return _seats[_index].riche.message;
@@ -113,6 +112,13 @@ contract EtherRiche
         {
           /* found a new lowest claim */
           lowestClaimIndex = i;
+        }
+        else if( 0 == _seats[i].claim_wei )
+        {
+          /* erase the claim */
+          _seats[i].riche.addr = 0;
+          _seats[i].riche.avatarUrl = '';
+          _seats[i].riche.message = '';
         }
       }
     }
