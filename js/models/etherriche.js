@@ -42,6 +42,7 @@ models.EtherRiche = Backbone.Model.extend(
     );
 
     /* fetch the current Riche */
+    this._seats.reset( { silent:true } );
     for( var i=0; ( this.seatCount > i ); ++i )
     {
       let _i = i;
@@ -52,7 +53,7 @@ models.EtherRiche = Backbone.Model.extend(
           if( ! _err )
           {
             var riche = new models.Riche( { id:_i, contract:this.attributes.contract, claimValue:_result.c[0] } );
-            this._seats.set( riche );
+            this._seats.add( riche );
             riche.fetch();
           }
         }

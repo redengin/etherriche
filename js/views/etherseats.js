@@ -29,8 +29,13 @@ views.EtherSeats = Backbone.View.extend(
     this.$el.empty();
     this.views.forEach( function( view )
     {
-      this.$el.append( view.render().$el );
+      if( view.model.attributes.claimValue > 0 )
+      {
+        this.$el.html( view.render().el );
+      }
     }, this );
+
+    return this;
   }
 
 });
