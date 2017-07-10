@@ -7,15 +7,40 @@ models.EtherRiche = Backbone.Model.extend(
     burnTime:     undefined,  /* seconds until claim is fully burned */
     burnRate:     undefined,  /* wei burned per second */
     lastBurn:     undefined,  /* timestamp (in seconds) of last burn */
+
+    contract:     undefined,  /* the contract to use */
   },
+
+  presentValue: function( claim )
+  {
+    if( ! claim ) return 0;
+
+    let parent = this.attributes.etherriche;
+    let burnRate = this.attributes.burnRate;
+    let lastBurn = this.attributes.lastBurn;
+
+    let burnDuration = web3.toBigNumber( ( Date.now() / 1000 ) - lastBurn );
+
+    return ( claim.minus( burnRate.times( burnDuration ) ) );
+  },
+
 
   constructor: function()
   {
+    /* call base constructor */
     Backbone.Model.apply( this, arguments );
+
+    /* create the seats collection */
     this._seats = new collections.Seats();
+    for( let i=0; 5 > i; ++i )
+    {
+      let model = new models.Riche( { id:i, contract:this.attributes.contract, etherriche:this } );
+      this._seats.add( model );
+    }
   },
 
-  fetch: function( options )
+
+  fetch: function()
   {
     /* fetch burnTime */
     this.attributes.contract.burnTime.call(
@@ -29,11 +54,12 @@ models.EtherRiche = Backbone.Model.extend(
     this.attributes.contract.burnRate.call(
       ( _err, _result ) =>
       {
-        if( ! _err ) this.set( 'burnRate', _result.c[0] );
+        let burnRate = web3.toBigNumber( _result.c[0] );
+        if( ! _err ) this.set( 'burnRate', burnRate );
       }
     );
 
-    /* fetch lastUpdate */
+    /* fetch lastBurn */
     this.attributes.contract.lastBurn.call(
       ( _err, _result ) =>
       {
@@ -42,23 +68,7 @@ models.EtherRiche = Backbone.Model.extend(
     );
 
     /* fetch the current Riche */
-    this._seats.reset( { silent:true } );
-    for( var i=0; ( this.seatCount > i ); ++i )
-    {
-      let _i = i;
-      /* fetch current claim */
-      this.attributes.contract.getSeatClaim.call( i,
-        ( _err, _result ) =>
-        {
-          if( ! _err )
-          {
-            var riche = new models.Riche( { id:_i, contract:this.attributes.contract, claimValue:_result.c[0] } );
-            this._seats.add( riche );
-            riche.fetch();
-          }
-        }
-      );
-    }
+    this._seats.fetch();
   },
 
 });

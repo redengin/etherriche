@@ -19,9 +19,13 @@ $(document).ready( () =>
   /* run the application */
   function main()
   {
+    /* create the model */
     etherRiche = new models.EtherRiche( { contract: Contract.at(contractAddress) } );
 
+    /* create the view */
     var view = new views.EtherSeats( { el:'#etherSeats', model:etherRiche } ).render();
+
+    /* start the updating */
     etherRiche.fetch();
   }
 
