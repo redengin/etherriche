@@ -77,7 +77,7 @@ describe( 'etherRiche', function ()
     var createdCount = 0;
     for( var i=0; 5 > i; ++i )
     {
-      Contract.at( contractAddress ).buySeat( 'avatar'+i, 'hello world '+i,
+      Contract.at( contractAddress ).buySeat( 'avatar'+i, 'hello world '+i, 'url',
         {
           from: accounts[i],
           value: claim,
@@ -124,7 +124,7 @@ describe( 'etherRiche', function ()
 
   it( 'should reject a payment less than the present minimum', ( done ) =>
   {
-    Contract.at( contractAddress ).buySeat( 'INVALID', 'INVALID',
+    Contract.at( contractAddress ).buySeat( 'INVALID', 'INVALID', 'INVALID',
       {
         from: accounts[5],
         value: ( claim - 1 ),
@@ -148,7 +148,7 @@ describe( 'etherRiche', function ()
 
   it( 'should accept a payment equal to the present minimum', ( done ) =>
   {
-    Contract.at( contractAddress ).buySeat( 'replacer equal', 'I replaced a seat',
+    Contract.at( contractAddress ).buySeat( 'replacer equal', 'I replaced a seat', 'my url',
       {
         from: accounts[5],
         value: claim,
@@ -171,7 +171,7 @@ describe( 'etherRiche', function ()
 
   it( 'should accept a payment greater than the present value minimum', ( done ) =>
   {
-    Contract.at( contractAddress ).buySeat( 'replacer greater', 'I replaced a seat',
+    Contract.at( contractAddress ).buySeat( 'replacer greater', 'I replaced a seat', 'my url',
       {
         from: accounts[6],
         value: ( claim + 1 ),
@@ -238,7 +238,7 @@ describe( 'etherRiche', function ()
 
   it( 'then should accept any claim after 30 days', ( done ) =>
   {
-    Contract.at( contractAddress ).buySeat( 'lowballer', 'I lowballed a seat',
+    Contract.at( contractAddress ).buySeat( 'lowballer', 'I lowballed a seat', 'my url',
       {
         from: accounts[7],
         value: 1,
@@ -261,7 +261,7 @@ describe( 'etherRiche', function ()
 
   it( 'then should accept topoff a current claim', ( done ) =>
   {
-    Contract.at( contractAddress ).buySeat( 'replacer greater', 'I replaced a seat',
+    Contract.at( contractAddress ).buySeat( 'replacer greater', 'I replaced a seat', 'my url',
       {
         from: accounts[4],
         value: 2,

@@ -17,6 +17,7 @@ contract EtherRiche
     address   addr;
     string    avatarUrl;
     string    message;
+    string    messageUrl;
   }
 
   /* A seat in the contract */
@@ -33,14 +34,14 @@ contract EtherRiche
   Seat[5]     _seats;
 
 
-  function buySeat( string _avatarUrl, string _message ) payable
+  function buySeat( string _avatarUrl, string _message, string _messageUrl ) payable
       returns( uint )
   {
     /* no money, no play */
     assert( msg.value > 0 );
 
     /* update the current seat claims */
-    _updateClaims( _avatarUrl, _message );
+    _updateClaims( _avatarUrl, _message, _messageUrl );
 
     /* update the burn rate */
     _updateBurnRate();
@@ -61,6 +62,12 @@ contract EtherRiche
     return _seats[_index].riche.avatarUrl;
   }
 
+  function getSeatMessageUrl( uint _index )
+    constant returns ( string )
+  {
+    return _seats[_index].riche.messageUrl;
+  }
+  
   function getSeatMessage( uint _index )
     constant returns ( string )
   {
@@ -92,7 +99,8 @@ contract EtherRiche
   }
 
 
-  function _updateClaims( string _avatarUrl, string _message ) private
+  function _updateClaims( string _avatarUrl, string _message, string _messageUrl  )
+      private
   {
     var lowestClaimIndex = 0;
     var isTopUp = false;
@@ -119,6 +127,7 @@ contract EtherRiche
           _seats[i].riche.addr = 0;
           _seats[i].riche.avatarUrl = '';
           _seats[i].riche.message = '';
+          _seats[i].riche.messageUrl = '';
         }
       }
     }
@@ -133,6 +142,7 @@ contract EtherRiche
         _seats[lowestClaimIndex].riche.addr = msg.sender;
         _seats[lowestClaimIndex].riche.avatarUrl = _avatarUrl;
         _seats[lowestClaimIndex].riche.message = _message;
+        _seats[lowestClaimIndex].riche.messageUrl = _messageUrl;
       }
       else
       {

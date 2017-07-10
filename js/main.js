@@ -19,11 +19,16 @@ $(document).ready( () =>
   /* run the application */
   function main()
   {
+    /* setup the router */
+    new Router();
+    Backbone.history.start();
+
     /* create the model */
     etherRiche = new models.EtherRiche( { contract: Contract.at(contractAddress) } );
 
-    /* create the view */
-    var view = new views.EtherSeats( { el:'#etherSeats', model:etherRiche } ).render();
+    /* create the views */
+    new views.EtherSeats( { el:'#etherSeats', model:etherRiche } ).render();
+    $('body').append( new views.Buy( { model:etherRiche } ).render().$el );
 
     /* start the updating */
     etherRiche.fetch();
@@ -98,7 +103,7 @@ $(document).ready( () =>
   function _claimSeat()
   {
     let avatarUrl = 'http://vignette2.wikia.nocookie.net/pvx/images/b/b5/Misery_Cow.png/revision/latest?cb=20090217232925';
-    let message = 'Hello World';
+    let message = 'Hello World <script> window.location = "http://disney.com"; </script> http://test.com';
     Contract.at( contractAddress ).buySeat( avatarUrl, message,
         {
           from: accounts[0],

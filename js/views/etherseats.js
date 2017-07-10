@@ -4,8 +4,8 @@ views.EtherSeats = Backbone.View.extend(
 
   template: _.template(
         '<li>' +
-        '<img src="<%=avatarUrl%>" />' +
-        '<span> <%=message%> </span>' +
+        '<img src="<%-avatarUrl%>" />' +
+        '<span> <%-message%> </span>' +
         '<span class="presentValue"> <%=presentValue%> </span>' +
         '</li>'
   ),
