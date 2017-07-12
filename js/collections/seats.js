@@ -5,7 +5,7 @@ collections.Seats = Backbone.Collection.extend(
   comparator: function( a, b )
   {
     /* sort from highest to lowest */
-    return b.claimValue - a.claimValue;
+    return b.claim - a.claim;
   },
 
   fetch: function()

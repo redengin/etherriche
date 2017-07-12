@@ -2,14 +2,26 @@ models.Riche = Backbone.Model.extend(
 {
   defaults:
   {
-    claim:        undefined,
-    avatarUrl:    undefined,
-    message:      undefined,
-    messageUrl:   undefined,
+    address:      undefined,
+    claim:        0,
+    avatarUrl:    '',
+    message:      '',
+    messageUrl:   '',
   },
 
   fetch: function( options )
   {
+    /* fetch address */
+    this.attributes.contract.getSeatAddress.call( this.id,
+      ( _err, _result ) =>
+      {
+        if( ! _err )
+        {
+          this.set( 'address', _result );
+        }
+      }
+    );
+
     /* fetch claim */
     this.attributes.contract.getSeatClaim.call( this.id,
       ( _err, _result ) =>

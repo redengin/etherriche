@@ -35,7 +35,6 @@ contract EtherRiche
 
 
   function buySeat( string _avatarUrl, string _message, string _messageUrl ) payable
-      returns( uint )
   {
     /* no money, no play */
     assert( msg.value > 0 );
@@ -54,6 +53,12 @@ contract EtherRiche
     constant returns ( uint )
   {
     return _seats[_index].claim_wei;
+  }
+
+  function getSeatAddress( uint _index )
+    constant returns ( address )
+  {
+    return _seats[_index].riche.addr;
   }
 
   function getSeatAvatarUrl( uint _index )

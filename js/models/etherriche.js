@@ -71,4 +71,27 @@ models.EtherRiche = Backbone.Model.extend(
     this._seats.fetch();
   },
 
+  buy: function( riche )
+  {
+    console.log( riche );
+    this.attributes.contract.buySeat(
+      riche.attributes.avatarUrl,
+      riche.attributes.message,
+      riche.attributes.messageUrl,
+      {
+        from: riche.attributes.addresss,
+        value: riche.attributes.claim,
+        gas: 4E6,
+      },
+      ( _err, _result ) =>
+      {
+        if( _err )
+        {
+          // TODO handle failure
+          console.log( _err );
+        }
+      }
+    );
+  }
+
 });

@@ -18,15 +18,14 @@ views.EtherSeats = Backbone.View.extend(
 
     Backbone.View.apply( this, arguments );
     this.listenTo( this.model._seats, 'all', this.render );
+
+    // TODO fetch on an interval
+    this.model.fetch();
   },
 
   render: function()
   {
     this.$el.empty();
-
-    let buyButton = $( '<button>BUY</button> ');
-    buyButton.click( ()=>{ router.navigate( 'buy', true )} );
-    this.$el.append( buyButton );
 
     this.model._seats.each( function(riche)
     {

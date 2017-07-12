@@ -9,19 +9,18 @@ var Router = Backbone.Router.extend(
 
   showList : function()
   {
-    /* create the views */
-    $('body').append( new views.EtherSeats( { model:etherRiche } ).render().$el );
+    $('#activity').empty();
 
-    /* start the updating */
-    etherRiche.fetch();
+    /* create the views */
+    $('#main').html( new views.EtherSeats( { model:etherRiche } ).render().$el );
   },
 
 
   showBuyForm : function()
   {
-    console.log( "buyer" );
+    // TODO inject a Riche model matching web3 default account
+    $('#activity').html( new views.Buy().render().$el );
   },
-
 
 
 });
